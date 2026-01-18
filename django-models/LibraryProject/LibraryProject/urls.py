@@ -5,4 +5,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Added the slash after 'books'
     path('books/', include('relationship_app.urls')), 
+    
 ]
