@@ -5,11 +5,11 @@ for book in books:
     print(book.title)
 
 
-library = Library.objects.get(name='Cairo')
+library = Library.objects.get(name='library_name')
 books = library.books.all()
 for book in books:
     print(book.title)
 
-library = Library.objects.get(name='Alex')
+library = Library.objects.get(name='library_name')
 librarian = Librarian.objects.get(library=library)
 print(librarian.name)
