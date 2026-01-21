@@ -27,7 +27,7 @@ class LibraryDetailView(DetailView):
 
     
 
-def signup_view(request):
+def register(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password1']
