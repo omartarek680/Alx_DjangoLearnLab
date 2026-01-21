@@ -1,11 +1,13 @@
 # relationship_app/views.py
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from .models import Book
 from .models import Library
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic import CreateView
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.contrib.auth import login
 from django.urls import reverse_lazy
 
 
@@ -24,7 +26,13 @@ class LibraryDetailView(DetailView):
     context_object_name = 'library'
 
     
-class RegistrationView(CreateView):
-    form_class = UserCreationForm 
-    template_name = 'relationship_app/registration.html'
-    seccess_url = reverse_lazy('login')
+
+def signup_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password1']
+        user = User.objects.create_user(username=username, password=password)
+        login(request, user)
+        return redirect('home')
+    else:
+        return render(request, 'relationship_app/registration.html')
