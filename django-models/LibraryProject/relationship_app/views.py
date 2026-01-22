@@ -29,10 +29,13 @@ class LibraryDetailView(DetailView):
 
 def register(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password1']
-        user = User.objects.create_user(username=username, password=password)
-        login(request, user)
-        return redirect('home')
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+        else:
+            return render(request, 'relationship_app/registration.html', {'form': form})
     else:
-        return render(request, 'relationship_app/registration.html')
+        form = UserCreationForm()
+        return render(request, 'relationship_app/registration.html', {'form': form})
