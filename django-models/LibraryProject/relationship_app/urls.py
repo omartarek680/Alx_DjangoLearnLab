@@ -10,4 +10,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(template_name='relationship_app/login.html'), name='login'),
     path('signup/', views.register, name='signup'),
     path('logout/', LogoutView.as_view(template_name='relationship_app/logout.html'), name='logout'),
+    path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('librarian_dashboard/', views.librarian_dashboard, name='librarian_dashboard'),
+    path('member_dashboard/', views.member_dashboard, name='member_dashboard'),
 ]
