@@ -55,7 +55,7 @@ def is_member(user):
     return user.is_authenticated and user.userprofile.role == 'Member'
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(lambda user: user.is_authenticated and user.userprofile.role == 'Admin')
 def admin_dashboard(request):
     return render(request, 'relationship_app/admin_view.html')
 
