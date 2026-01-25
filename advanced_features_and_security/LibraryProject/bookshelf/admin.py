@@ -11,7 +11,6 @@ class BookAdmin(admin.ModelAdmin):
 
 
 
-@admin.register(CustomUser, CustomUserAdmin)
 class CustomUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
         ("Additional Info", {
@@ -25,4 +24,5 @@ class CustomUserAdmin(UserAdmin):
         }),
     )
 
+admin.register(CustomUser, CustomUserAdmin)
 
