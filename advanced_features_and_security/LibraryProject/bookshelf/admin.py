@@ -10,7 +10,7 @@ class BookAdmin(admin.ModelAdmin):
     list_filter = ('publication_year',)
 
 @admin.register(CustomUser)
-class CustomUserManager(UserAdmin):
+class CustomUser(UserAdmin):
     list_display = ('username', 'email', 'date_of_birth', 'profile_photo')
     search_fields = ('username', 'email')
     list_filter = ('date_of_birth',)
