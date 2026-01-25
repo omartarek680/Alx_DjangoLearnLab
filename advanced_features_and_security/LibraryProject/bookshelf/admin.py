@@ -9,8 +9,8 @@ class BookAdmin(admin.ModelAdmin):
     search_fields = ('title', 'author','publication_year')
     list_filter = ('publication_year',)
 
-@admin.register(CustomUser,UserAdmin)
-class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'date_of_birth', 'favorite_genre')
+@admin.register(CustomUser)
+class CustomUserManager(UserAdmin):
+    list_display = ('username', 'email', 'date_of_birth', 'profile_photo')
     search_fields = ('username', 'email')
     list_filter = ('date_of_birth',)
