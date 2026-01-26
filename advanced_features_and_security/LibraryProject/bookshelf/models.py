@@ -7,6 +7,12 @@ class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
     publication_year = models.IntegerField()
+
+    class Meta:
+        permissions = [
+            ("can_add_book", "Can add book"),
+            ("can_delete_book", "Can delete book"),
+        ]
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email=None, password=None, **extra_fields):
         if not username:
@@ -20,6 +26,7 @@ class CustomUserManager(BaseUserManager):
         )
         user.set_password(password)
         user.save(using=self._db)
+
         return user
 
     def create_superuser(self, username, email=None, password=None, **extra_fields):
