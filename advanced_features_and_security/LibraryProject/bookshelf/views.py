@@ -12,3 +12,7 @@ def edit_view(request):
 def book_list_view(request):
     books = Book.objects.all()
     return render(request, 'bookshelf/book_list.html', {'books': books})
+
+
+
+def 
