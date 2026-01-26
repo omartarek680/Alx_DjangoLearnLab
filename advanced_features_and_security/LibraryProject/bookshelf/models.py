@@ -10,9 +10,9 @@ class Book(models.Model):
 
     class Meta:
         permissions = [
-            ("can_add_book", "Can add book"),
-            ("can_create_book", "Can create book"),
-            ("can_delete_book", "Can delete book"),
+            ("can_add", "Can add book"),
+            ("can_create", "Can create book"),
+            ("can_delete", "Can delete book"),
         ]
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email=None, password=None, **extra_fields):
