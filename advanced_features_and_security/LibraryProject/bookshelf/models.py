@@ -11,6 +11,7 @@ class Book(models.Model):
     class Meta:
         permissions = [
             ("can_add_book", "Can add book"),
+            ("can_create_book", "Can create book"),
             ("can_delete_book", "Can delete book"),
         ]
 class CustomUserManager(BaseUserManager):
