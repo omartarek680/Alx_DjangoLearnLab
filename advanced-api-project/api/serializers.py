@@ -35,8 +35,10 @@ class BookSerializer(serializers.ModelSerializer):
         return val
 
 
+
+
 class AuthorSerializer(serializers.ModelSerializer):
-    books = BookSerializer(many=True, read_only=True,source="books")
+    books = BookSerializer(many=True, read_only=True)
 
     class Meta:
         model = Author
