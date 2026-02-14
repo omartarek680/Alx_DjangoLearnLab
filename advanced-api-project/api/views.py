@@ -4,14 +4,14 @@ from .models import Author, Book
 from .serializers import BookSerializer, AuthorSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from django_filters import rest_framework
-
+from rest_framework import filters
 class ListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
-    filter_backends = [rest_framework.DjangoFilterBackend]
+    filter_backends = [rest_framework.DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ["title","publication_year", "author"]
-   
+    search_fields = ["title"]
 class CreateView(generics.CreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
