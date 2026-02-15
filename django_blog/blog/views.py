@@ -8,8 +8,9 @@ from .serializers import PostSerializer
 from .models import Post
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView, DetailView
 from django.views.generic.edit import FormView
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
 class RegisterView(CreateView):
@@ -27,9 +28,29 @@ class LoginView(FormView):
         login(self.request, user)
         return super().form_valid(form)
 
-
+@login_required
 def logout_view(request):
-    pass
+    logout(request)
+    return redirect("login")
+
+class ListPosts(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'blog/all-posts.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user).order_by('-published_date')
+
+class DetailPost(LoginRequiredMixin,DetailView):
+    model = Post
+    template_name = 'blog/post-detail.html'
+    context_object_name = 'post'
+    def get_queryset(self):
+
+ 
+       return Post.objects.filter(author= self.request.user)
+
+
 
 def profile_view(request):
     pass

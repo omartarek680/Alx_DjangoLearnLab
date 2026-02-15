@@ -2,6 +2,10 @@
 {% block title %} All Posts{% endblock  %}
 
 {% block content %}
-All Posts
+<h2>All Posts </h2>
+{% for post in posts %}
+    <h3> {{post.title}} </h3>
+    <p> {{post.contnet}}</p>
+{% endfor %}
 
 {% endblock  %}
