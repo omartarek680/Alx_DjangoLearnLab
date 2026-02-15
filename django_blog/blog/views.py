@@ -6,35 +6,27 @@ from django.contrib.auth import login, logout, authenticate
 from rest_framework import generics
 from .serializers import PostSerializer
 from .models import Post
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from django.views.generic.edit import FormView
 # Create your views here.
 
+class RegisterView(CreateView):
+    model = Post
+    form_class = CustomCreationForm
+    template_name = 'blog/register.html'
+    success_url = reverse_lazy('login')
 
-def reqgister_view(request):
-    if request.method == 'POST':
-        form = CustomCreationForm(request.data)
+class LoginView(FormView):
+    template_name = 'blog/login.html'
+    form_class = AuthenticationForm
+    success_url = reverse_lazy('profile')
+    def form_valid(self,form):
+        user = form.get_user()
+        login(self.request, user)
+        return super().form_valid(form)
 
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-        
-    else:
-        form = UserCreationForm()
-
-    return render(request, 'blog/register.html',{'form': form})
-
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request,data=request.data)
-        
-        if form.is_valid():
-            user = form.get_user()
-            login(request,user)
-            return redirect('profile')
-        
-    else:
-        form = AuthenticationForm()
-
-    return render(request,'blog/login.html',{'form':form})    
 
 def logout_view(request):
     pass
@@ -44,9 +36,10 @@ def profile_view(request):
 
 def home_view(request):
     pass
-
+@login_required
 def posts_view(request):
-    return render(request,'blog/all-posts.html')
+    posts = Post.objects.filter(author=request.user)
+    return render(request,'blog/all-posts.html',{'post':posts})
 
 def post_detail_view(request,pk):
     post = Post.objects.filter(pk=pk)
