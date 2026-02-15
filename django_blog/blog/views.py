@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .forms import CustomCreationForm
+from .forms import CustomCreationForm, PostForm
 from django.contrib.auth import login, logout, authenticate
 from rest_framework import generics
 from .serializers import PostSerializer
@@ -45,9 +45,12 @@ def profile_view(request):
 def home_view(request):
     pass
 
-# def posts_view(request):
-#     pass
+def posts_view(request):
+    return render(request,'blog/all-posts.html')
 
+def post_detail_view(request,pk):
+    post = Post.objects.filter(pk=pk)
+    return render(request,'blog/post-detail.html',{'post':post})
 
 class ListView(generics.ListAPIView):
     queryset = Post.objects.all()
