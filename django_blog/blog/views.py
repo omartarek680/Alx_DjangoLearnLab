@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import CustomCreationForm
 from django.contrib.auth import login, logout, authenticate
-
-
+from rest_framework import generics
+from .serializers import PostSerializer
+from .models import Post
 # Create your views here.
 
 
@@ -22,8 +24,11 @@ def reqgister_view(request):
 
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request.data)
+        form = AuthenticationForm(request,data=request.data)
+        
         if form.is_valid():
+            user = form.get_user()
+            login(request,user)
             return redirect('profile')
         
     else:
@@ -40,5 +45,26 @@ def profile_view(request):
 def home_view(request):
     pass
 
-def posts_view(request):
-    pass
+# def posts_view(request):
+#     pass
+
+
+class ListView(generics.ListAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+class DetailView(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+class CreateView(generics.CreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+class UpdateView(generics.UpdateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+class DeleteView(generics.DestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer

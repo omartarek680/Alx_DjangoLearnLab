@@ -7,5 +7,10 @@ urlpatterns = [
     path('logout',views.logout_view, name='logout'),
     path('profile/',views.profile_view, name= 'profile'),
     path('home/',views.home_view, name= 'home'),
-    path('post/', views.posts_view, name= 'posts')
+    path('posts/', views.ListView.as_view(), name='posts'),
+    path('posts/<int:pk>/', views.DetailView.as_view(), name='detail-post'),
+    path('posts/new/', views.CreateView.as_view(), name='create-post'),
+    path('posts/<int:pk>/edit/', views.UpdateView.as_view(), name='edit-post'),
+    path('posts/<int:pk>/delete/', views.DetailView.as_view(), name='delete-post'),
+
 ]
