@@ -1,0 +1,9 @@
+{% extends "blog/base.html" %}
+
+{% block title %} Register{% endblock  %}
+
+{% block content %}
+{% csrf_token %} 
+{{form.as_p}}
+<button  type='submit'> Submit  </button>
+{% endblock  %}
