@@ -1,87 +1,158 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .forms import CustomCreationForm, PostForm
-from django.contrib.auth import login, logout, authenticate
-from rest_framework import generics
-from .serializers import PostSerializer
-from .models import Post
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView
-from django.views.generic.edit import FormView
+from django.contrib.auth import login, logout
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-# Create your views here.
+
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
+from django.views.generic.edit import FormView
+
+from .models import Post
+from .forms import CustomCreationForm, PostForm
+
+# DRF
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from .serializers import PostSerializer
+
+
+User = get_user_model()
+
+# ---------------------------
+# Auth (Templates)
+# ---------------------------
 
 class RegisterView(CreateView):
-    model = Post
+    model = User                 # ✅ User, not Post
     form_class = CustomCreationForm
-    template_name = 'blog/register.html'
-    success_url = reverse_lazy('login')
+    template_name = "blog/register.html"
+    success_url = reverse_lazy("login")
+
 
 class LoginView(FormView):
-    template_name = 'blog/login.html'
+    template_name = "blog/login.html"
     form_class = AuthenticationForm
-    success_url = reverse_lazy('profile')
-    def form_valid(self,form):
-        user = form.get_user()
-        login(self.request, user)
+    success_url = reverse_lazy("profile")
+
+    def form_valid(self, form):
+        login(self.request, form.get_user())
         return super().form_valid(form)
+
 
 @login_required
 def logout_view(request):
     logout(request)
     return redirect("login")
 
-class ListPosts(LoginRequiredMixin, ListView):
-    model = Post
-    template_name = 'blog/all-posts.html'
-    context_object_name = 'posts'
-
-    def get_queryset(self):
-        return Post.objects.filter(author=self.request.user).order_by('-published_date')
-
-class DetailPost(LoginRequiredMixin,DetailView):
-    model = Post
-    template_name = 'blog/post-detail.html'
-    context_object_name = 'post'
-    def get_queryset(self):
-
- 
-       return Post.objects.filter(author= self.request.user)
-
-
 
 def profile_view(request):
-    pass
+    # TODO: render profile template if you have one
+    return render(request, "blog/profile.html")
+
 
 def home_view(request):
-    pass
-@login_required
-def posts_view(request):
-    posts = Post.objects.filter(author=request.user)
-    return render(request,'blog/all-posts.html',{'post':posts})
+    return render(request, "blog/home.html")
 
-def post_detail_view(request,pk):
-    post = Post.objects.filter(pk=pk)
-    return render(request,'blog/post-detail.html',{'post':post})
 
-class ListView(generics.ListAPIView):
-    queryset = Post.objects.all()
+# ---------------------------
+# Posts CRUD (Templates)
+# templates expected:
+# - blog/all-posts.html
+# - blog/post-detail.html
+# - blog/post_form.html
+# - blog/post_confirm_delete.html
+# ---------------------------
+
+class PostListView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = "blog/all-posts.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user).order_by("-published_date")
+
+
+class PostDetailView(LoginRequiredMixin, DetailView):
+    model = Post
+    template_name = "blog/post-detail.html"
+    context_object_name = "post"
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user)
+
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = "blog/post_form.html"
+    success_url = reverse_lazy("posts-list")
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user  # ✅ user can’t fake author
+        return super().form_valid(form)
+
+
+class PostUpdateView(LoginRequiredMixin, UpdateView):
+    model = Post
+    form_class = PostForm
+    template_name = "blog/post_form.html"
+    success_url = reverse_lazy("posts-list")
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user)
+
+
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    template_name = "blog/post_confirm_delete.html"
+    success_url = reverse_lazy("posts-list")
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user)
+
+
+# ---------------------------
+# Posts API (DRF)
+# Prefix them with /api/
+# ---------------------------
+
+class PostListAPI(generics.ListAPIView):
     serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
 
-class DetailView(generics.RetrieveAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user).order_by("-published_date")
 
-class CreateView(generics.CreateAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
 
-class UpdateView(generics.UpdateAPIView):
-    queryset = Post.objects.all()
+class PostDetailAPI(generics.RetrieveAPIView):
     serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
 
-class DeleteView(generics.DestroyAPIView):
-    queryset = Post.objects.all()
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user)
+
+
+class PostCreateAPI(generics.CreateAPIView):
     serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class PostUpdateAPI(generics.UpdateAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user)
+
+
+class PostDeleteAPI(generics.DestroyAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user)

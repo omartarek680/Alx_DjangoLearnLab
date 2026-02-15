@@ -1,11 +1,15 @@
-{% extends "blog/base.html" %}
-{% block title %} All Posts{% endblock  %}
+<h2>All Posts</h2>
 
-{% block content %}
-<h2>All Posts </h2>
 {% for post in posts %}
-    <h3> {{post.title}} </h3>
-    <p> {{post.contnet}}</p>
-{% endfor %}
+    <div>
+        <h3>
+            <a href="{% url 'post-detail' post.pk %}">
+                {{ post.title }}
+            </a>
+        </h3>
 
-{% endblock  %}
+        <p>
+            {{ post.content|truncatewords:20 }}
+        </p>
+    </div>
+{% endfor %}
